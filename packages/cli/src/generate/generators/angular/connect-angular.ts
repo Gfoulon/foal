@@ -39,21 +39,22 @@ export function connectAngular(path: string) {
     })
     .modify('angular.json', content => {
       const config = JSON.parse(content);
-
+      let angularProject = config.defaultProject || Object.keys(config.projects)[0] || 'app';
       // Proxy configuration
-      config.projects[config.defaultProject].architect ||= {};
-      config.projects[config.defaultProject].architect.serve ||= {};
-      config.projects[config.defaultProject].architect.serve.options ||= {};
-      config.projects[config.defaultProject].architect.serve.options.proxyConfig = 'src/proxy.conf.json';
-
+//       if (config.defaultProject === undefined) {
+//         console.log("NO default project (Angular>14 - use firstproject 'app'?) => ",angularProject);
+//       }
+      config.projects[angularProject].architect ||= {};
+      config.projects[angularProject].architect.serve ||= {};
+      config.projects[angularProject].architect.serve.options ||= {};
+      config.projects[angularProject].architect.serve.options.proxyConfig = 'src/proxy.conf.json';
       // Output build directory
-      const outputPath = join(relative(path, process.cwd()), 'public')
-        // Make projects generated on Windows build on Unix.
-        .replace(/\\/g, '/');
-      config.projects[config.defaultProject].architect.build ||= {};
-      config.projects[config.defaultProject].architect.build.options ||= {};
-      config.projects[config.defaultProject].architect.build.options.outputPath = outputPath;
-
+      const outputPath = (0, path_1.join)((0, path_1.relative)(path, process.cwd()), 'public')
+          // Make projects generated on Windows build on Unix.
+          .replace(/\\/g, '/');
+      config.projects[angularProject].architect.build ||= {};
+      config.projects[angularProject].architect.build.options ||= {};
+      config.projects[angularProject].architect.build.options.outputPath = outputPath;
       return JSON.stringify(config, null, 2);
     });
 }
